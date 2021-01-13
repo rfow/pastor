@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='Pastor',
-    version="0.1.0",
+    version="0.1.1",
     packages=['pastor'],
     description='Data store for Pandas.',
     url='https://github.com/rfow/pastor',
