@@ -50,13 +50,21 @@ class Collection(object):
             raise ValueError('Item already exists. To overwrite, use overwrite=True.')
         elif not self._item_path(item).exists():
             os.makedirs(self._item_path(item))
-
         data.index.rename('date', inplace=True)
         data.reset_index(inplace=True)
-
         if metadata:
             utils.write_metadata(Path(self.datastore, self.collection, item), metadata)
         data.to_feather(Path(self.datastore, self.collection, item, f'{item}.ftr'))
+
+    def upsert_item(self, item, data, metadata=None):
+        if not self._item_path(item).exists():
+            self.write_item(item, data, metadata)
+        else:
+            old_data = self.read_item(item)
+            old_meta = old_data._metadata
+            new_data = old_data.join(data, how='outer') if not data.equals(old_data) else old_data
+            new_meta = metadata if metadata is not None else old_meta
+            self.write_item(item, new_data, new_meta, overwrite=True)
 
     def read_item(self, item):
         if not self._item_path(item).exists():
