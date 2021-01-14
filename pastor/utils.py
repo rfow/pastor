@@ -10,9 +10,8 @@ def subdirs(d):
 
 
 def read_metadata(path):
-    if path.exists():
-        with path.open() as f:
-            return loads(f.read())
+    with path.open() as f:
+        return loads(f.read())
 
 
 def write_metadata(path, metadata):
@@ -48,4 +47,11 @@ def delete_store(store):
 
 def delete_stores():
     shutil.rmtree(get_path())
+    return True
+
+
+def dict_search(dictionary, **kwargs):
+    for k, v in kwargs.items():
+        if k not in dictionary.keys() or not dictionary[k] == v:
+            return False
     return True

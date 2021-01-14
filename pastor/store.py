@@ -31,7 +31,6 @@ class store(object):
                     "Collection exists! To overwrite, use `overwrite=True`")
 
         os.makedirs(collection_path)
-        os.makedirs(Path(collection_path, "_snapshots"))
 
         # update collections
         self.collections = self.list_collections()

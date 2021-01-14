@@ -25,21 +25,10 @@ class Collection(object):
         if not kwargs:
             return dirs
 
-        matched = []
-        # DO BELOW IN FUNCTION FOR SPEED?
-        for d in dirs:
-            meta = utils.read_metadata(Path(self.datastore, self.collection, d, 'metadata.oj'))
-
-            m = 0
-            keys = list(meta.keys())
-            for k, v in kwargs.items():
-                if k in keys and meta[k] == v:
-                    m += 1
-
-            if m == len(kwargs):
-                matched.append(d)
-
-        return set(matched)
+        meta_paths = [Path(self.datastore, self.collection, d, 'metadata.oj') for d in dirs]
+        meta_dicts = [utils.read_metadata(meta_path) for meta_path in meta_paths if meta_path.exists()]
+        matches = [meta_dict['id'] for meta_dict in meta_dicts if utils.dict_search(meta_dict, **kwargs)]
+        return matches
 
     def delete_item(self, item):
         shutil.rmtree(self._item_path(item))
