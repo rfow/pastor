@@ -9,9 +9,7 @@ class store(object):
     def __repr__(self):
         return f'pastor.datastore {self.datastore}'
 
-    def __init__(self, datastore):
-
-        datastore_path = utils.get_path()
+    def __init__(self, datastore_path, datastore):
         if not datastore_path.exists():
             os.makedirs(datastore_path)
 
@@ -29,31 +27,20 @@ class store(object):
             else:
                 raise ValueError(
                     "Collection exists! To overwrite, use `overwrite=True`")
-
         os.makedirs(collection_path)
-
-        # update collections
         self.collections = self.list_collections()
-
-        # return the collection
         return Collection(collection, self.datastore)
 
     def delete_collection(self, collection):
-        # delete collection (subdir)
         shutil.rmtree(Path(self.datastore, collection))
-
-        # update collections
         self.collections = self.list_collections()
         return True
 
     def list_collections(self):
-        # lists collections (subdirs)
         return utils.subdirs(self.datastore)
 
     def collection(self, collection, overwrite=False):
         if collection in self.collections and not overwrite:
             return Collection(collection, self.datastore)
-
-        # create it
         self._create_collection(collection, overwrite)
         return Collection(collection, self.datastore)

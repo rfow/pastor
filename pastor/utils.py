@@ -1,8 +1,13 @@
 import os
 import shutil
-from pastor import config
 from pathlib import Path
 from orjson import dumps, loads
+from pastor import store
+
+
+def connect(store_path, store_name, collection):
+    s = store(store_path, store_name)
+    return s.collection(collection)
 
 
 def subdirs(d):
@@ -21,32 +26,19 @@ def write_metadata(path, metadata):
         f.write(metadata)
 
 
-def get_path():
-    return Path(config.DEFAULT_PATH)
-
-
-def set_path(path):
-    path = get_path() if path is None else Path(path)
-    config.DEFAULT_PATH = path
-    if not path.exists():
-        os.makedirs(path)
-    return path
-
-
-def list_stores():
-    path = get_path()
+def list_stores(path):
     if not path.exists():
         os.makedirs(path)
     return subdirs(path)
 
 
-def delete_store(store):
-    shutil.rmtree(get_path().joinpath(store))
+def delete_store(path, store):
+    shutil.rmtree(Path(path).joinpath(store))
     return True
 
 
-def delete_stores():
-    shutil.rmtree(get_path())
+def delete_stores(path):
+    shutil.rmtree(Path(path))
     return True
 
 

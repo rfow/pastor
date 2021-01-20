@@ -45,15 +45,22 @@ class Collection(object):
             utils.write_metadata(Path(self.datastore, self.collection, item), metadata)
         data.to_feather(Path(self.datastore, self.collection, item, f'{item}.ftr'))
 
-    def upsert_item(self, item, data, metadata=None):
+    def upsert_item(self, item, new_data, metadata=None):
         if not self._item_path(item).exists():
-            self.write_item(item, data, metadata)
+            self.write_item(item, new_data, metadata)
         else:
-            old_data = self.read_item(item)
-            old_meta = old_data._metadata
-            new_data = old_data.join(data, how='outer') if not data.equals(old_data) else old_data
-            new_meta = metadata if metadata is not None else old_meta
-            self.write_item(item, new_data, new_meta, overwrite=True)
+            data = self.read_item(item)
+            old_meta = data._metadata
+            try:
+                data.update(new_data)
+            except Exception as e:
+                raise ValueError(f'Upsert issue for {item}.\n'
+                                 f'New df: {new_data}\n'
+                                 f'Old df: {data}\n'
+                                 f'Exception: {str(e)}')
+            else:
+                new_meta = metadata if metadata is not None else old_meta
+                self.write_item(item, data, new_meta, overwrite=True)
 
     def read_item(self, item):
         if not self._item_path(item).exists():
