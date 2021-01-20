@@ -6,7 +6,7 @@ from pastor import store
 
 
 def connect(store_path, store_name, collection):
-    s = store(store_path, store_name)
+    s = store.Store(store_path, store_name)
     return s.collection(collection)
 
 

@@ -5,17 +5,18 @@ from pastor.collection import Collection
 from pathlib import Path
 
 
-class store(object):
+class Store(object):
     def __repr__(self):
         return f'pastor.datastore {self.datastore}'
 
     def __init__(self, datastore_path, datastore):
-        if not datastore_path.exists():
-            os.makedirs(datastore_path)
-
         self.datastore = Path(datastore_path, datastore)
+
+        if not self.datastore.parent.exists():
+            os.makedirs(datastore_path)
         if not self.datastore.exists():
             os.makedirs(self.datastore)
+
         self.collections = self.list_collections()
 
     def _create_collection(self, collection, overwrite=False):
