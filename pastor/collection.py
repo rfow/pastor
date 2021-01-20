@@ -52,6 +52,7 @@ class Collection(object):
             data = self.read_item(item)
             old_meta = data._metadata
             try:
+                data = data.reindex(data.index.union(new_data.index))
                 data.update(new_data)
             except Exception as e:
                 raise ValueError(f'Upsert issue for {item}.\n'
