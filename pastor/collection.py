@@ -20,14 +20,15 @@ class Collection(object):
             return str(p)
         return p
 
-    def list_items(self, **kwargs):
+    def list_items(self, just_ids=True, **kwargs):
+        """ List ids from metadata if just_ids else return meta dicts. """
         dirs = utils.subdirs(Path(self.datastore, self.collection))
-        if not kwargs:
-            return dirs
-
         meta_paths = [Path(self.datastore, self.collection, d, 'metadata.oj') for d in dirs]
         meta_dicts = [utils.read_metadata(meta_path) for meta_path in meta_paths if meta_path.exists()]
-        matches = [meta_dict['id'] for meta_dict in meta_dicts if utils.dict_search(meta_dict, **kwargs)]
+        if just_ids:
+            matches = [meta_dict['id'] for meta_dict in meta_dicts if utils.dict_search(meta_dict, **kwargs)]
+        else:
+            matches = [meta_dict for meta_dict in meta_dicts if utils.dict_search(meta_dict, **kwargs)]
         return matches
 
     def delete_item(self, item):
